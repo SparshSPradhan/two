@@ -389,14 +389,74 @@
     </div>
 
     <script>
-      fetch('TWO/pages/data.json')
-        .then(res => res.json())
-        .then(data => console.log(data))
-        .then(task => console.log(task))
-        .then(assets => {
-          console.log(assets);
+      function renderProjectTasks(project) {
+        const container = document.createElement('div'); // Main container for the project
+
+        project.tasks.forEach(task => {
+          const taskContainer = document.createElement('div'); // Container for each task
+
+          const taskTitle = document.createElement('h3');
+          taskTitle.textContent = `Task: ${ task.task_title }`;
+          taskContainer.appendChild(taskTitle);
+
+          const taskDescription = document.createElement('p');
+          taskDescription.textContent = task.task_description;
+          taskContainer.appendChild(taskDescription);
+
+          const assetsList = document.createElement('ul'); // List to hold all assets for the task
+          task.assets.forEach(asset => {
+            const assetItem = document.createElement('li'); // List item for each asset
+
+            const assetTitle = document.createElement('h4');
+            assetTitle.textContent = `Asset: ${ asset.asset_title }`;
+            assetItem.appendChild(assetTitle);
+
+            const assetDescription = document.createElement('p');
+            assetDescription.textContent = asset.asset_description;
+            assetItem.appendChild(assetDescription);
+
+            if (asset.asset_content_type === 'video') {
+              const video = document.createElement('iframe');
+              video.src = asset.asset_content.trim();
+              video.width = "560";
+              video.height = "315";
+              video.frameBorder = "0";
+              video.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+              video.allowFullscreen = true;
+              assetItem.appendChild(video);
+            } else if (asset.asset_content_type === 'article') {
+              const link = document.createElement('a');
+              link.href = asset.asset_content.trim();
+              link.textContent = "Read more";
+              link.target = "_blank";
+              assetItem.appendChild(link);
+            }
+
+            assetsList.appendChild(assetItem); // Add the asset to the list
+          });
+
+          taskContainer.appendChild(assetsList); // Add the assets list to the task container
+          container.appendChild(taskContainer); // Add the task container to the main container
         });
 
+        document.body.appendChild(container); // Append the container to the body or another specific element
+      }
+  
+   
+      const url = 'https://dev.deepthought.education/assets/uploads/files/files/others/ddugky_project.json';
+
+
+        let urlData;
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            urlData = data;
+             renderProjectTasks(urlData)
+            console.log(data);
+          })
+          .catch(error => {
+            console.error('Error fetching the data:', error);
+          });
     </script>
   </body>
 </html>
